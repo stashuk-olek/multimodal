@@ -23,7 +23,6 @@ class TransformerOutput(NamedTuple):
     last_hidden_state: Optional[Tensor] = None
     pooler_output: Optional[Tensor] = None
     hidden_states: Optional[List[Tensor]] = None
-    attentions: Optional[List[Tensor]] = None
     image_labels: Optional[Tensor] = None
     current_key_values: Optional[List[Tuple[Tensor, Tensor]]] = None
 
@@ -365,7 +364,9 @@ class TransformerDecoderLayer(nn.Module):
         encoder_hidden_states: Tensor,
         cross_attention_mask: Optional[Tensor] = None,
     ) -> Tensor:
-        assert self.cross_attention is not None, """
+        assert (
+            self.cross_attention is not None
+        ), """
             Cannot use cross-attention unless self.cross_attention and
             self.cross_attention_dropout are defined.
         """
@@ -408,9 +409,9 @@ class TransformerDecoderLayer(nn.Module):
 
         # Optional cross-attention
         if self.use_cross_attention and encoder_hidden_states is not None:
-            assert hasattr(self, "cross_attention_layernorm"), (
-                "Cross-attention layernorm not initialized"
-            )
+            assert hasattr(
+                self, "cross_attention_layernorm"
+            ), "Cross-attention layernorm not initialized"
             cross_attn_input = self.cross_attention_layernorm(self_attn_output)
             cross_attn_output = self._cross_attention_block(
                 cross_attn_input,
@@ -452,9 +453,9 @@ class TransformerDecoderLayer(nn.Module):
                 raise ValueError(
                     "encoder_hidden_states must be provided for cross attention"
                 )
-            assert hasattr(self, "cross_attention_layernorm"), (
-                "Cross-attention layernorm not initialized"
-            )
+            assert hasattr(
+                self, "cross_attention_layernorm"
+            ), "Cross-attention layernorm not initialized"
             cross_attn_output = self._cross_attention_block(
                 self_attn_output, encoder_hidden_states, cross_attention_mask
             )
